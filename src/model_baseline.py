@@ -75,6 +75,9 @@ DF_PRUNE = 0.5              # 方面词文档频率剪枝阈值(Qiu 2011 频率�
 # 隐式方面四元组建: 观点词"训练被标注率"门控(压制 一直用/用完/多/少 等标注稀疏词)
 IMPLICIT_RATE_MIN = 0.25    # 标注率低于此值则不允许作为隐式方面观点发射
 IMPLICIT_RATE_OCC_MIN = 3   # 出现文档数达到此值才启用门控(小样本不武断过滤)
+# spaCy 中文句法解析(可被 config/model_baseline.yaml 覆盖)
+SPACY_MODEL = "zh_core_web_sm"
+PARSE_BATCH_SIZE = 256      # nlp.pipe 批大小
 
 # ----------------------------------------------------------------------
 # 1) 通用中文情感种子(仅用于发现训练集未覆盖的观点词, 高精度通用词)
@@ -394,6 +397,127 @@ SUBJ_RELS = {"nsubj", "nsubj:pass", "amod", "attr", "acl", "acl:relcl"}
 BRIDGE_DEPS = {"dep", "ccomp", "xcomp", "advcl", "parataxis"}
 NOUN_POS = {"NOUN", "PROPN"}
 
+# ======================================================================
+# 0.3 外部 YAML 模型配置(config/model_baseline.yaml, 可直接编辑调用)
+# ======================================================================
+# 上述全部超参/词表/依存关系集合均可在 config/model_baseline.yaml 中修改;
+# 导入本模块时若该 yaml 存在且已安装 PyYAML, 则以 yaml 值覆盖默认常量;
+# 文件缺失 / 未装 PyYAML / yaml 中某字段缺省, 对应项回退使用上面的默认值。
+MODEL_CONFIG_PATH = BASE_DIR / "config" / "model_baseline.yaml"
+
+_HP_SCALARS = {
+    "seed": ("SEED", int),
+    "dev_ratio": ("DEV_RATIO", float),
+    "max_phrase_len": ("MAX_PHRASE_LEN", int),
+    "max_prop_iter": ("MAX_PROP_ITER", int),
+    "gap_window": ("GAP_WINDOW", int),
+    "df_prune": ("DF_PRUNE", float),
+    "implicit_rate_min": ("IMPLICIT_RATE_MIN", float),
+    "implicit_rate_occ_min": ("IMPLICIT_RATE_OCC_MIN", int),
+}
+_LEX_SETS = {
+    "functional_verbs": "FUNCTIONAL_VERBS",
+    "negators": "NEGATORS",
+    "contrast_cc": "CONTRAST_CC",
+    "coord_cc": "COORD_CC",
+    "degree_adv": "DEGREE_ADV",
+    "generic_targets": "GENERIC_TARGETS",
+    "product_terms": "PRODUCT_TERMS",
+    "body_terms": "BODY_TERMS",
+    "split_block_heads": "SPLIT_BLOCK_HEADS",
+    "opinion_stopwords": "OPINION_STOPWORDS",
+    "person_terms": "PERSON_TERMS",
+    "aspect_stopwords": "ASPECT_STOPWORDS",
+    "price_cue_terms": "PRICE_CUE_TERMS",
+}
+_LEX_TUPLES = {
+    "final_particles": "FINAL_PARTICLES",
+    "product_suffixes": "PRODUCT_SUFFIXES",
+}
+_SYN_SETS = {
+    "ot_arc_rels": "OT_ARC_RELS",
+    "a_compound_rels": "A_COMPOUND_RELS",
+    "subj_rels": "SUBJ_RELS",
+    "bridge_deps": "BRIDGE_DEPS",
+    "noun_pos": "NOUN_POS",
+}
+
+
+def load_model_config(path=MODEL_CONFIG_PATH, verbose=True):
+    """加载 yaml 模型配置并覆盖模块级默认常量。
+
+    返回加载状态: "ok" / "missing" / "no_pyyaml"。
+    词表在 yaml 中以列表书写: 大多数还原为 set; final_particles/product_suffixes
+    还原为 tuple; manual_category_kw 保持 list(保留平局优先级顺序与重复词权重)。
+    """
+    path = Path(path)
+    if not path.exists():
+        return "missing"
+    try:
+        import yaml
+    except ImportError:
+        if verbose:
+            print("[配置] 未安装 PyYAML, 使用代码内默认配置(可 pip install pyyaml)")
+        return "no_pyyaml"
+    with open(path, "r", encoding="utf-8") as f:
+        cfg = yaml.safe_load(f) or {}
+    g = globals()
+
+    hp = cfg.get("hyperparams") or {}
+    for key, (name, cast) in _HP_SCALARS.items():
+        if hp.get(key) is not None:
+            g[name] = cast(hp[key])
+
+    pol = cfg.get("polarities") or {}
+    for key, name in (("positive", "POS"), ("neutral", "NEU"),
+                      ("negative", "NEG")):
+        if pol.get(key):
+            g[name] = str(pol[key])
+
+    text_cfg = cfg.get("text") or {}
+    if text_cfg.get("clause_punct"):
+        g["CLAUSE_PUNCT"] = set(text_cfg["clause_punct"])
+
+    lex = cfg.get("lexicons") or {}
+    for key, name in _LEX_SETS.items():
+        if lex.get(key):
+            g[name] = set(lex[key])
+    for key, name in _LEX_TUPLES.items():
+        if lex.get(key):
+            g[name] = tuple(lex[key])
+    if lex.get("manual_seed"):
+        g["MANUAL_SEED"] = {
+            str(k): set(v) for k, v in lex["manual_seed"].items() if v
+        }
+    if lex.get("manual_category_kw"):
+        g["MANUAL_CATEGORY_KW"] = {
+            str(k): [str(w) for w in v]
+            for k, v in lex["manual_category_kw"].items() if v
+        }
+    if lex.get("char_category_kw"):
+        g["CHAR_CATEGORY_KW"] = {
+            str(k): str(v) for k, v in lex["char_category_kw"].items()
+        }
+
+    syn = cfg.get("syntax") or {}
+    for key, name in _SYN_SETS.items():
+        if syn.get(key):
+            g[name] = set(syn[key])
+
+    parser_cfg = cfg.get("parser") or {}
+    if parser_cfg.get("spacy_model"):
+        g["SPACY_MODEL"] = str(parser_cfg["spacy_model"])
+    if parser_cfg.get("parse_batch_size"):
+        g["PARSE_BATCH_SIZE"] = int(parser_cfg["parse_batch_size"])
+
+    if verbose:
+        print("[配置] 已加载外部模型配置: %s" % path)
+    return "ok"
+
+
+# 导入即生效(须在 DoublePropagation 等类定义之前: 其默认参数在定义时求值)
+load_model_config()
+
 
 @dataclass
 class Token:
@@ -437,7 +561,7 @@ class ZhParser:
                 "缺少依赖, 请先安装: pip install spacy 并下载中文模型 "
                 "zh_core_web_sm (python -m spacy download zh_core_web_sm)"
             ) from e
-        self.nlp = spacy.load("zh_core_web_sm", disable=["ner"])
+        self.nlp = spacy.load(SPACY_MODEL, disable=["ner"])
         # 领域词注入: 仅 jieba.add_word(spaCy 的 ChineseTokenizer 实测使用
         # 独立 jieba 实例且不支持 token_match, 二者对 spaCy 均不生效)。
         # 多词短语(遮暇功能/活动价/很好用)不依赖分词合并 —— scan_phrases
@@ -450,7 +574,8 @@ class ZhParser:
         """rows: list[(rid, text)] -> dict rid -> ParsedDoc"""
         texts = [light_clean(t) for _, t in rows]
         out = {}
-        for doc, (rid, _) in zip(self.nlp.pipe(texts, batch_size=256), rows):
+        for doc, (rid, _) in zip(
+                self.nlp.pipe(texts, batch_size=PARSE_BATCH_SIZE), rows):
             out[rid] = self._convert(rid, doc)
         return out
 
