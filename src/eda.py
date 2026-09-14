@@ -9,8 +9,8 @@
   3. 缺失值、重复值、异常样本(位置-术语一致性/取值越界/id对齐等)
   4. 分词对人工标注术语的整词保留率(分词质量验证)
 产物:
-  data/processed/eda_report.txt          文字报告
-  data/processed/eda_figures/*.png       可视化图表
+  outputs/logs/eda_report.txt           文字报告
+  outputs/figures/*.png                 可视化图表
 说明: 文本清洗/分词/标签解析逻辑复用 preprocess.py, 本脚本不重复实现。
 """
 
@@ -34,8 +34,8 @@ import preprocess as pp
 plt.rcParams["font.sans-serif"] = ["SimHei", "Microsoft YaHei"]
 plt.rcParams["axes.unicode_minus"] = False
 
-FIG_DIR = pp.OUT_DIR / "eda_figures"
-REPORT_PATH = pp.OUT_DIR / "eda_report.txt"
+# 路径配置(统一由 config.py 提供)
+from config import EDA_FIG_DIR as FIG_DIR, EDA_REPORT_PATH as REPORT_PATH
 LENGTH_BINS = [0, 10, 20, 30, 40, 50, 200]
 LENGTH_LABELS = ["1-10", "11-20", "21-30", "31-40", "41-50", "51+"]
 
@@ -436,6 +436,7 @@ def main():
     for p in sorted(FIG_DIR.glob('*.png')):
         log(f"    - {p.name}")
 
+    REPORT_PATH.parent.mkdir(parents=True, exist_ok=True)
     REPORT_PATH.write_text("\n".join(_lines), encoding="utf-8")
 
 

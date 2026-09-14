@@ -191,8 +191,8 @@ jieba 用户词典: 1694 词(标注词 1654 + 人工词 93)
 ========================================================================
 产物清单
 ========================================================================
-文字报告: D:\code\机器学习课设\courseproject\courseproject\data\processed\eda_report.txt
-图表目录: D:\code\机器学习课设\courseproject\courseproject\data\processed\eda_figures
+文字报告: D:\code\机器学习课设\courseproject\courseproject\outputs\logs\eda_report.txt
+图表目录: D:\code\机器学习课设\courseproject\courseproject\outputs\figures\processed\eda_figures
     - 01_length_distribution.png
     - 02_quads_per_review.png
     - 03_category_distribution.png

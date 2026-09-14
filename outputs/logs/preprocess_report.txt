@@ -4,6 +4,6 @@
 [词典] 标注 6633 行/覆盖 3229 条评论; 唯一方面词 256, 唯一观点词 1418
 [词典] 注入 jieba: 标注词 1654 + 人工词 93 => 去重合并 1694 词; 跳过含标点标注词 ['好，棒', '好，用']
 [词典] 停用词安全校验: 通过(0 冲突)
-[标签] 解析完成: D:\code\机器学习课设\courseproject\courseproject\data\processed\Train_labels_parsed.csv (6633 行; '_'已转NA, 位置已转Int64)
+[标签] 解析完成: D:\code\机器学习课设\courseproject\courseproject\outputs\figures\processed\Train_labels_parsed.csv (6633 行; '_'已转NA, 位置已转Int64)
 [TRAIN] 3229 -> 去空(-0) -> 去重(-30) -> 去无意义(-0) = 3199; 0有效词评论 0 条; 输出: Train_reviews_processed.csv
 [TEST] 2237 -> 去空(-0) -> 去重(-18) -> 去无意义(-0) = 2219; 0有效词评论 0 条; 输出: Test_reviews_processed.csv

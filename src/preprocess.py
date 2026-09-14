@@ -22,13 +22,11 @@ import pandas as pd
 import jieba
 
 # ----------------------------------------------------------------------
-# 路径配置(基于本脚本位置定位, 避免工作目录/反斜杠转义问题)
+# 路径配置(统一由 config.py 提供, 便于集中维护; OUT_DIR 为预处理产物目录)
 # ----------------------------------------------------------------------
-BASE_DIR = Path(__file__).resolve().parents[1]          # courseproject/courseproject
-TRAIN_REVIEWS_PATH = BASE_DIR / "data" / "raw" / "TRAIN" / "Train_reviews.csv"
-TRAIN_LABELS_PATH = BASE_DIR / "data" / "raw" / "TRAIN" / "Train_labels.csv"
-TEST_REVIEWS_PATH = BASE_DIR / "data" / "raw" / "TEST" / "Test_reviews.csv"
-OUT_DIR = BASE_DIR / "data" / "processed"
+from config import (BASE_DIR, TRAIN_REVIEWS_PATH, TRAIN_LABELS_PATH,
+                    TEST_REVIEWS_PATH, PROCESSED_DIR as OUT_DIR,
+                    PREPROCESS_LOG_PATH)
 
 # ----------------------------------------------------------------------
 # 1) 人工兜底领域词典: 化妆品评价词/方面词/情感词
@@ -311,9 +309,10 @@ def main():
             f"-> 去无意义(-{st['n_empty']}) = {st['n_final']}; "
             f"0有效词评论 {st['n_zero_tokens']} 条; 输出: {out_path.name}")
 
-    report_path = OUT_DIR / "preprocess_report.txt"
+    report_path = PREPROCESS_LOG_PATH
+    report_path.parent.mkdir(parents=True, exist_ok=True)
     report_path.write_text("\n".join(lines), encoding="utf-8")
-    log("[输出] 处理报告: %s" % report_path)
+    log("[输出] 运行日志: %s" % report_path)
 
 
 if __name__ == "__main__":

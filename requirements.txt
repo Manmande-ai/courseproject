@@ -10,6 +10,7 @@
 pandas==2.3.3
 numpy==2.4.6
 jieba==0.42.1
+matplotlib==3.10.6
 spacy==3.8.7
 # 中文句法模型(不在 PyPI, 用上面两种方式之一单独安装, 版本需与 spacy 对应):
 # zh_core_web_sm==3.8.0

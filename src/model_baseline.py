@@ -59,11 +59,10 @@ from preprocess import CATEGORIES, POLARITIES, EMOJI_TABLE  # noqa: E402
 # ======================================================================
 # 0. 路径与超参
 # ======================================================================
-BASE_DIR = Path(__file__).resolve().parents[1]
-TRAIN_REVIEWS_PATH = BASE_DIR / "data" / "raw" / "TRAIN" / "Train_reviews.csv"
-TRAIN_LABELS_PATH = BASE_DIR / "data" / "raw" / "TRAIN" / "Train_labels.csv"
-TEST_REVIEWS_PATH = BASE_DIR / "data" / "raw" / "TEST" / "Test_reviews.csv"
-OUT_DIR = BASE_DIR / "data" / "baseline"
+# 路径配置(统一由 config.py 提供, 便于集中维护; OUT_DIR 为基线产物目录)
+from config import (BASE_DIR, TRAIN_REVIEWS_PATH, TRAIN_LABELS_PATH,
+                    TEST_REVIEWS_PATH, BASELINE_DIR as OUT_DIR,
+                    BASELINE_LOG_PATH)
 
 POS, NEU, NEG = "正面", "中性", "负面"
 CLAUSE_PUNCT = set("，。！？；、,.!?;")
@@ -1427,7 +1426,7 @@ def main():
     _dump_predictions(OUT_DIR / "dev_predictions.csv", pred_dev, gold_dev, rev_map_tr)
 
     if args.skip_test:
-        _save_report(OUT_DIR, lines)
+        _save_report(lines)
         return
 
     # ---------- 全量训练 ----------
@@ -1469,7 +1468,7 @@ def main():
     result_path = _write_result_csv(TEST_REVIEWS_PATH, pred_te)
     log("[输出] 提交文件(无 BOM UTF-8/无表头): %s" % result_path)
     log("[总耗时] %.1f 秒" % (time.time() - t_start))
-    _save_report(OUT_DIR, lines)
+    _save_report(lines)
 
 
 def _log_run_meta(log, meta):
@@ -1562,10 +1561,11 @@ def _dump_lexicons(kn):
                                 index=False, encoding="utf-8-sig")
 
 
-def _save_report(out_dir, lines):
-    path = out_dir / "baseline_report.txt"
+def _save_report(lines):
+    path = BASELINE_LOG_PATH
+    path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text("\n".join(lines), encoding="utf-8")
-    print("[输出] 运行报告: %s" % path)
+    print("[输出] 运行日志: %s" % path)
 
 
 if __name__ == "__main__":
