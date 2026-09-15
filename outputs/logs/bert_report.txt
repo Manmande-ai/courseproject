@@ -1,0 +1,28 @@
+========================================================================
+BERT+CRF ACOS 训练  pretrained=bert-base-chinese  device=cpu
+========================================================================
+[Epoch 1/8] loss=75.1873 (crf=74.7085 cat=0.6736 pol=0.2839)  lr=1.94e-05
+         dev  P=0.6178 R=0.4688 F1=0.5331 (tp=459 fp=284 fn=520)
+         [*] best F1=0.5331, 已保存权重 -> D:\code\机器学习课设\courseproject\courseproject\data\bert\bert_crf.pt
+[Epoch 2/8] loss=28.1279 (crf=27.8675 cat=0.3323 pol=0.1884)  lr=1.67e-05
+         dev  P=0.6515 R=0.4985 F1=0.5648 (tp=488 fp=261 fn=491)
+         [*] best F1=0.5648, 已保存权重 -> D:\code\机器学习课设\courseproject\courseproject\data\bert\bert_crf.pt
+[Epoch 3/8] loss=18.0150 (crf=17.7808 cat=0.3142 pol=0.1541)  lr=1.39e-05
+         dev  P=0.6702 R=0.5107 F1=0.5797 (tp=500 fp=246 fn=479)
+         [*] best F1=0.5797, 已保存权重 -> D:\code\机器学习课设\courseproject\courseproject\data\bert\bert_crf.pt
+[Epoch 4/8] loss=11.9838 (crf=11.7961 cat=0.2371 pol=0.1384)  lr=1.11e-05
+         dev  P=0.6521 R=0.5015 F1=0.5670 (tp=491 fp=262 fn=488)
+[Epoch 5/8] loss=8.0928 (crf=7.8688 cat=0.2784 pol=0.1696)  lr=8.33e-06
+         dev  P=0.6702 R=0.5169 F1=0.5836 (tp=506 fp=249 fn=473)
+         [*] best F1=0.5836, 已保存权重 -> D:\code\机器学习课设\courseproject\courseproject\data\bert\bert_crf.pt
+[Epoch 6/8] loss=5.6663 (crf=5.4852 cat=0.2331 pol=0.1290)  lr=5.56e-06
+         dev  P=0.6725 R=0.5097 F1=0.5799 (tp=499 fp=243 fn=480)
+[Epoch 7/8] loss=3.9248 (crf=3.7672 cat=0.2041 pol=0.1110)  lr=2.78e-06
+         dev  P=0.6755 R=0.5189 F1=0.5869 (tp=508 fp=244 fn=471)
+         [*] best F1=0.5869, 已保存权重 -> D:\code\机器学习课设\courseproject\courseproject\data\bert\bert_crf.pt
+[Epoch 8/8] loss=2.8179 (crf=2.6885 cat=0.1580 pol=0.1008)  lr=0.00e+00
+         dev  P=0.6832 R=0.5220 F1=0.5918 (tp=511 fp=237 fn=468)
+         [*] best F1=0.5918, 已保存权重 -> D:\code\机器学习课设\courseproject\courseproject\data\bert\bert_crf.pt
+[完成] 训练耗时 122.5 min, best dev F1=0.5918
+[输出] 训练快照: D:\code\机器学习课设\courseproject\courseproject\config\model_bert_trained.yaml
+[推理] 2026-09-15 19:06:25  耗时=120.7s  四元组=3426  行数=3426  -> D:\code\机器学习课设\courseproject\courseproject\data\bert\Result.csv
