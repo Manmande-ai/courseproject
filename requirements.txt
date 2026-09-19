@@ -1,0 +1,17 @@
+# Double-Propagation-ACOS 规则基线运行依赖
+# Python 3.10+ (开发验证: Python 3.13.9 / Windows)
+#
+# 安装:
+#   pip install -r requirements.txt
+#   python -m spacy download zh_core_web_sm
+# 注: 若 spacy 官方下载缓慢, zh_core_web_sm 可直接安装对应版本 wheel, 例如:
+#   pip install https://github.com/explosion/spacy-models/releases/download/zh_core_web_sm-3.8.0/zh_core_web_sm-3.8.0-py3-none-any.whl
+
+pandas==2.3.3
+numpy==2.4.6
+jieba==0.42.1
+matplotlib==3.10.6
+spacy==3.8.7
+PyYAML==6.0.3
+# 中文句法模型(不在 PyPI, 用上面两种方式之一单独安装, 版本需与 spacy 对应):
+# zh_core_web_sm==3.8.0
