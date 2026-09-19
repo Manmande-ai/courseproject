@@ -36,7 +36,7 @@ sys.path.insert(0, str(_HERE))
 
 import model_bert as mb   # noqa: E402  (复用训练脚本的全部组件)
 from config import (      # noqa: E402
-    BERT_DIR, TEST_REVIEWS_PROC_PATH, BERT_LOG_PATH,
+    BERT_DIR, TEST_REVIEWS_PATH, BERT_LOG_PATH,
 )
 
 
@@ -52,7 +52,7 @@ def write_result_csv(test_path, pred):
     每个测试 id 必出现, 空结果行全 '_'; 列序 id,Aspect,Opinion,Category,Polarity。
     pred: {rid: set[(a_text|None, cat, o_text|None, pol)]}
     """
-    te = pd.read_csv(test_path, encoding="utf-8-sig")
+    te = pd.read_csv(test_path, encoding="utf-8")
     ids = te["id"].astype(int).tolist()
     rows = []
     for rid in ids:
@@ -105,10 +105,11 @@ def main():
     tokenizer = AutoTokenizer.from_pretrained(pretrained)
     print("[加载] 权重: %s" % weights)
 
-    # 读测试集 (id 顺序与 Train 一致)
-    te = pd.read_csv(TEST_REVIEWS_PROC_PATH, encoding="utf-8-sig")
+    # 必须读原始测试集: 预处理会去重/去空(少 18 个 id), 提交要求 id 与原始集完全一致
+    # id 顺序保持与测试文件一致(与 baseline predict.py 行为相同)
+    te = pd.read_csv(TEST_REVIEWS_PATH, encoding="utf-8")
     rev_map = dict(zip(te["id"].astype(int), te["Reviews"].astype(str)))
-    ids = sorted(rev_map)
+    ids = te["id"].astype(int).tolist()
 
     print("[推理] %d 条测试评论..." % len(ids))
     t0 = time.time()
@@ -120,7 +121,7 @@ def main():
     elapsed = time.time() - t0
 
     # 写 Result.csv
-    path, n_rows = write_result_csv(TEST_REVIEWS_PROC_PATH, pred)
+    path, n_rows = write_result_csv(TEST_REVIEWS_PATH, pred)
     n_q = sum(len(v) for v in pred.values())
     print("[完成] 推理耗时 %.1f s, 共 %d 条评论 / %d 个四元组, %d 行结果"
           % (elapsed, len(ids), n_q, n_rows))

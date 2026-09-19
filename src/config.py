@@ -24,6 +24,7 @@ PROCESSED_DIR = BASE_DIR / "outputs" / "processed"    # preprocess.py 清洗数�
 FIGURES_DIR = BASE_DIR / "outputs" / "figures"        # eda.py 图表输出
 BASELINE_DIR = BASE_DIR / "data" / "baseline"         # model_baseline.py 输出
 BERT_DIR = BASE_DIR / "data" / "bert"                # model_bert.py 输出(权重/Result)
+LLM_DIR = BASE_DIR / "data" / "llm"                  # LLM SFT 数据与预测结果
 
 # ----------------------------------------------------------------------
 # 原始数据路径
@@ -51,6 +52,17 @@ PREPROCESS_LOG_PATH = LOG_DIR / "preprocess_report.txt"
 EDA_REPORT_PATH = LOG_DIR / "eda_report.txt"
 BASELINE_LOG_PATH = LOG_DIR / "baseline_report.txt"
 BERT_LOG_PATH = LOG_DIR / "bert_report.txt"           # model_bert.py 训练日志
+LLM_LOG_PATH = LOG_DIR / "llm_report.txt"             # LLM 训练/推理日志
+
+# ----------------------------------------------------------------------
+# LLM SFT 数据与产物路径(data/llm 下)
+#   - sft_train.json:       LLaMA-Factory 训练数据(alpaca 格式)
+#   - dataset_info.json:    LLaMA-Factory 数据集注册
+#   - Result.csv:           LLM 推理后拍平的提交结果
+# ----------------------------------------------------------------------
+LLM_SFT_TRAIN_PATH = LLM_DIR / "sft_train.json"
+LLM_DATASET_INFO_PATH = LLM_DIR / "dataset_info.json"
+LLM_RESULT_PATH = LLM_DIR / "Result.csv"
 
 # ----------------------------------------------------------------------
 # 配置目录(手工编辑的超参 YAML + 训练完自动生成的快照 YAML)
@@ -58,3 +70,5 @@ BERT_LOG_PATH = LOG_DIR / "bert_report.txt"           # model_bert.py 训练日�
 CONFIG_DIR = BASE_DIR / "config"
 BERT_CONFIG_PATH = CONFIG_DIR / "model_bert.yaml"             # 手工编辑的超参
 BERT_TRAINED_SNAPSHOT_PATH = CONFIG_DIR / "model_bert_trained.yaml"  # 训练完自动 dump 的快照
+LLM_QWEN7B_FULL_CONFIG_PATH = CONFIG_DIR / "llm_qwen7b_full.yaml"    # Qwen-2.5-7B/3-8B 全参 SFT
+LLM_QWEN14B_LORA_CONFIG_PATH = CONFIG_DIR / "llm_qwen14b_lora.yaml"  # Qwen-3-14B LoRA

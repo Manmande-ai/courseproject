@@ -1,0 +1,56 @@
+# =============================================================================
+# LLaMA-Factory QLoRA 配置 —— ModelScope (V100 16GB) 专用
+# =============================================================================
+# 适用模型: Qwen/Qwen2.5-7B-Instruct 或 Qwen/Qwen3-8B (4-bit 量化 + LoRA)
+# 训练方式: QLoRA (4-bit 量化基础模型 + LoRA 增量训练)
+# 显存需求: ~10-12GB, ModelScope 免费 V100 (16GB) 可跑
+#
+# 在 ModelScope Notebook 中运行:
+#   !llamafactory-cli train /mnt/workspace/courseproject/config/llm_qwen7b_qlora_modelscope.yaml
+#
+# 注意: dataset_dir 与 output_dir 均使用 ModelScope 绝对路径
+# =============================================================================
+
+### model
+model_name_or_path: Qwen/Qwen2.5-7B-Instruct   # 或 Qwen/Qwen3-8B
+trust_remote_code: true
+
+### method
+stage: sft
+do_train: true
+finetuning_type: lora
+lora_target: all
+lora_rank: 64
+lora_alpha: 128
+lora_dropout: 0.05
+
+### 4-bit 量化 (QLoRA 核心, 适配 16GB 显存)
+quantization_bit: 4
+quantization_type: nf4
+double_quantization: true
+
+### dataset
+dataset: sft_train
+dataset_dir: /mnt/workspace/courseproject/data/llm
+template: qwen
+cutoff_len: 1024
+max_samples: 100000
+overwrite_cache: true
+preprocessing_num_workers: 16
+
+### output
+output_dir: /mnt/workspace/saves/qwen7b_qlora
+logging_steps: 10
+save_steps: 500
+plot_loss: true
+overwrite_output_dir: true
+
+### train (适配 V100 16GB)
+per_device_train_batch_size: 1
+gradient_accumulation_steps: 16
+learning_rate: 1.0e-4
+num_train_epochs: 3.0
+lr_scheduler_type: cosine
+warmup_ratio: 0.05
+bf16: true                    # V100 支持 bf16; 若报错改 fp16: true
+gradient_checkpointing: true

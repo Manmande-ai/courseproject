@@ -26,3 +26,5 @@ BERT+CRF ACOS 训练  pretrained=bert-base-chinese  device=cpu
 [完成] 训练耗时 122.5 min, best dev F1=0.5918
 [输出] 训练快照: D:\code\机器学习课设\courseproject\courseproject\config\model_bert_trained.yaml
 [推理] 2026-09-15 19:06:25  耗时=120.7s  四元组=3426  行数=3426  -> D:\code\机器学习课设\courseproject\courseproject\data\bert\Result.csv
+
+[推理] 2026-09-15 19:28:30  耗时=111.2s  四元组=3452  行数=3452  -> D:\code\机器学习课设\courseproject\courseproject\data\bert\Result.csv

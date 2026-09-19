@@ -61,7 +61,7 @@ _SRC_DIR = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(_SRC_DIR))
 from config import (  # noqa: E402
     BASE_DIR, TRAIN_REVIEWS_PROC_PATH, TRAIN_LABELS_PARSED_PATH,
-    TEST_REVIEWS_PROC_PATH, BERT_DIR, BERT_LOG_PATH, BERT_CONFIG_PATH,
+    TEST_REVIEWS_PATH, BERT_DIR, BERT_LOG_PATH, BERT_CONFIG_PATH,
     BERT_TRAINED_SNAPSHOT_PATH,
 )
 
@@ -598,7 +598,7 @@ def save_trained_snapshot(path, *, elapsed, best_f1, last_ep, last_metrics,
             "weights": _rel(BERT_DIR / "bert_crf.pt"),
             "label_vocab": _rel(BERT_DIR / "label_vocab.json"),
             "train_log": _rel(BERT_LOG_PATH),
-            "test_reviews": _rel(TEST_REVIEWS_PROC_PATH),
+            "test_reviews": _rel(TEST_REVIEWS_PATH),
         },
     }
     path.parent.mkdir(parents=True, exist_ok=True)

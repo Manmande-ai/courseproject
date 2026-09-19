@@ -1,0 +1,48 @@
+# =============================================================================
+# LLaMA-Factory 全参 SFT 配置 —— Qwen-2.5-7B / Qwen-3-8B
+# =============================================================================
+# 适用模型: Qwen/Qwen2.5-7B-Instruct 或 Qwen/Qwen3-8B
+# 训练方式: 全参数微调(full SFT)
+# 显存预估: ~50GB(bf16 + 优化器状态), 单卡 A100 80G 可跑; 显存不足请用 LoRA 方案
+#
+# 运行方式(在 LLaMA-Factory 根目录执行):
+#   llamafactory-cli train /path/to/courseproject/courseproject/config/llm_qwen7b_full.yaml
+#
+# 注意: dataset_dir 需指向本项目的 data/llm 目录(含 sft_train.json 与 dataset_info.json)
+# =============================================================================
+
+### model
+model_name_or_path: /mnt/workspace/models/models/qwen--Qwen2.5-7B-Instruct/snapshots/master   # 或 Qwen/Qwen3-8B
+trust_remote_code: true
+
+### method
+stage: sft
+do_train: true
+finetuning_type: full
+
+### dataset
+dataset: sft_train
+dataset_dir: ./data/llm                         # 指向 courseproject/courseproject/data/llm
+template: qwen                                   # Qwen2.5 / Qwen3 均使用 qwen 模板
+cutoff_len: 1024                                 # 评论较短, 1024 足够
+max_samples: 100000
+overwrite_cache: true
+preprocessing_num_workers: 16
+
+### output
+output_dir: ./saves/qwen7b_full_sft
+logging_steps: 10
+save_steps: 500
+plot_loss: true
+overwrite_output_dir: true
+
+### train
+per_device_train_batch_size: 4
+gradient_accumulation_steps: 8
+learning_rate: 6.0e-6                            # 全参学习率较小, 避免灾难性遗忘
+num_train_epochs: 3.0
+lr_scheduler_type: cosine                        # 余弦退火
+warmup_ratio: 0.05
+bf16: true                                       # A100/H100 用 bf16; V100 改 fp16: true
+gradient_checkpointing: true                     # 省显存, 速度降约 20%
+ddp_timeout: 180000000

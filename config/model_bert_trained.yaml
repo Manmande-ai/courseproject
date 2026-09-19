@@ -68,4 +68,4 @@ artifacts:
   weights: data/bert/bert_crf.pt
   label_vocab: data/bert/label_vocab.json
   train_log: outputs/logs/bert_report.txt
-  test_reviews: outputs/processed/Test_reviews_processed.csv
+  test_reviews: data/raw/TEST/Test_reviews.csv
