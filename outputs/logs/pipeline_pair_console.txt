@@ -1,0 +1,36 @@
+﻿python.exe : Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher ra
+te limits and faster downloads.
+At line:15 char:2832
++ ... NG='utf-8'; & "d:\code\机器学习课设\courseproject\.venv\Scripts\python.exe" ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (Warning: You ar...ster downloads.:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+[配置] 已加载: D:\code\机器学习课设\courseproject\courseproject\config\model_pipeline.yaml
+[环境] device=cpu pretrained=bert-base-chinese
+[超参] epochs=6 batch=8 max_len=256 lr_bert=2e-05 lr_head=0.001
+[配对] mlp_dim=200 loss_weight=1.0 pos_weight=2.0 thresholds=[0.3, 0.4, 0.5, 0.6, 0.7]
+[数据] 全量=3229 train=2745 dev=484
+
+Loading weights:   0%|          | 0/199 [00:00<?, ?it/s]
+Loading weights:   9%|▉         | 18/199 [00:00<00:01, 156.71it/s]
+Loading weights:  21%|██        | 41/199 [00:00<00:00, 193.88it/s]
+Loading weights: 100%|██████████| 199/199 [00:00<00:00, 630.92it/s]
+[transformers] [1mBertModel LOAD REPORT[0m from: bert-base-chinese
+Key                                        | Status     |  | 
+-------------------------------------------+------------+--+-
+cls.predictions.transform.dense.weight     | UNEXPECTED |  | 
+cls.predictions.transform.dense.bias       | UNEXPECTED |  | 
+cls.seq_relationship.bias                  | UNEXPECTED |  | 
+cls.predictions.transform.LayerNorm.bias   | UNEXPECTED |  | 
+cls.seq_relationship.weight                | UNEXPECTED |  | 
+cls.predictions.transform.LayerNorm.weight | UNEXPECTED |  | 
+cls.predictions.bias                       | UNEXPECTED |  | 
+
+Notes:
+- UNEXPECTED:	can be ignored when loading from different task/architecture; not ok if you expect identical arch.
+========================================================================
+方案C Stage1 (Aspect,Opinion) 对抽取  pretrained=bert-base-chinese device=cpu
+========================================================================
+  [Ep 1] 20/344 loss=279.7677 55s/剩894s
+  [Ep 1] 40/344 loss=231.0376 117s/剩892s

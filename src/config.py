@@ -25,6 +25,7 @@ FIGURES_DIR = BASE_DIR / "outputs" / "figures"        # eda.py 图表输出
 BASELINE_DIR = BASE_DIR / "data" / "baseline"         # model_baseline.py 输出
 BERT_DIR = BASE_DIR / "data" / "bert"                # model_bert.py 输出(权重/Result)
 LLM_DIR = BASE_DIR / "data" / "llm"                  # LLM SFT 数据与预测结果
+PIPELINE_DIR = BASE_DIR / "data" / "pipeline"        # 方案C 管道式模型产物(Stage1/Stage2 权重/Result)
 
 # ----------------------------------------------------------------------
 # 原始数据路径
@@ -53,6 +54,7 @@ EDA_REPORT_PATH = LOG_DIR / "eda_report.txt"
 BASELINE_LOG_PATH = LOG_DIR / "baseline_report.txt"
 BERT_LOG_PATH = LOG_DIR / "bert_report.txt"           # model_bert.py 训练日志
 LLM_LOG_PATH = LOG_DIR / "llm_report.txt"             # LLM 训练/推理日志
+PIPELINE_PAIR_LOG_PATH = LOG_DIR / "pipeline_pair_report.txt"  # 方案C Stage1 训练日志
 
 # ----------------------------------------------------------------------
 # LLM SFT 数据与产物路径(data/llm 下)
@@ -72,3 +74,14 @@ BERT_CONFIG_PATH = CONFIG_DIR / "model_bert.yaml"             # 手工编辑的�
 BERT_TRAINED_SNAPSHOT_PATH = CONFIG_DIR / "model_bert_trained.yaml"  # 训练完自动 dump 的快照
 LLM_QWEN7B_FULL_CONFIG_PATH = CONFIG_DIR / "llm_qwen7b_full.yaml"    # Qwen-2.5-7B/3-8B 全参 SFT
 LLM_QWEN14B_LORA_CONFIG_PATH = CONFIG_DIR / "llm_qwen14b_lora.yaml"  # Qwen-3-14B LoRA
+
+# ----------------------------------------------------------------------
+# 方案C 管道式: Stage1 (A,O) 对抽取 配置/权重/快照
+#   - pair_extractor.pt:   BERT-CRF span + 双仿射配对模型权重
+#   - pair_meta.json:      标签字典 + 最优阈值/评估指标
+# ----------------------------------------------------------------------
+PIPELINE_CONFIG_PATH = CONFIG_DIR / "model_pipeline.yaml"
+PIPELINE_TRAINED_SNAPSHOT_PATH = CONFIG_DIR / "model_pipeline_trained.yaml"
+PIPELINE_PAIR_WEIGHTS = PIPELINE_DIR / "pair_extractor.pt"
+PIPELINE_PAIR_META = PIPELINE_DIR / "pair_meta.json"
+PIPELINE_RESULT_PATH = PIPELINE_DIR / "Result.csv"

@@ -1,0 +1,17 @@
+========================================================================
+方案C Stage1 (Aspect,Opinion) 对抽取  pretrained=bert-base-chinese device=cpu
+========================================================================
+[Epoch 1/2] loss=163.5353 (crf=162.4211 pair=1.1142)
+  span  ASP F1=0.2941  OPN F1=0.6000
+  pair@0.5 P=0.4066 R=0.4405 F1=0.4229 pred/gold=1.08
+  pair@0.7(最优) P=0.4512 R=0.4405 F1=0.4458 pred/gold=0.98 top1兜底=0.000 安全行=0.150
+  [*] best F1=0.4458 (tau=0.7), 已保存权重
+[Epoch 2/2] loss=61.6990 (crf=61.0704 pair=0.6287)
+  span  ASP F1=0.7059  OPN F1=0.7468
+  pair@0.5 P=0.4545 R=0.6548 F1=0.5366 pred/gold=1.44
+  pair@0.7(最优) P=0.4953 R=0.6310 F1=0.5550 pred/gold=1.27 top1兜底=0.000 安全行=0.150
+  [*] best F1=0.5550 (tau=0.7), 已保存权重
+[完成] 耗时 2.2 min, best dev pair F1=0.5550 @tau=0.7
+[输出] 权重: D:\code\机器学习课设\courseproject\courseproject\data\pipeline\pair_extractor.pt
+[输出] 元数据: D:\code\机器学习课设\courseproject\courseproject\data\pipeline\pair_meta.json
+[输出] 快照: D:\code\机器学习课设\courseproject\courseproject\config\model_pipeline_trained.yaml

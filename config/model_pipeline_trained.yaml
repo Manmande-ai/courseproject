@@ -1,0 +1,74 @@
+_doc: 方案C Stage1 对抽取训练快照(自动生成, 勿手工编辑)
+generated_at: '2026-09-19 22:00:06'
+pretrained: bert-base-chinese
+device: cpu
+hyperparams:
+  seed: 42
+  max_len: 256
+  batch_size: 8
+  epochs: 2
+  lr_bert: 2.0e-05
+  lr_head: 0.001
+  weight_decay: 0.01
+  warmup_ratio: 0.1
+  grad_clip: 1.0
+  dropout: 0.1
+  dev_ratio: 0.15
+pair:
+  mlp_dim: 200
+  loss_weight: 1.0
+  pos_weight: 2.0
+  thresholds:
+  - 0.3
+  - 0.4
+  - 0.5
+  - 0.6
+  - 0.7
+training:
+  duration_min: 2.21
+  total_samples: 3229
+  train_samples: 200
+  dev_samples: 40
+  best_threshold: 0.7
+  best_dev_pair:
+    P: 0.4953271028037383
+    R: 0.6309523809523809
+    F1: 0.5549738219895288
+    tp: 53
+    fp: 54
+    fn: 31
+    pred/gold: 1.274
+    top1兜底率: 0.0
+    安全行率: 0.15
+  span_dev:
+    ASP:
+      P: 0.782608695652174
+      R: 0.6428571428571429
+      F1: 0.7058823529411765
+    OPN:
+      P: 0.7763157894736842
+      R: 0.7195121951219512
+      F1: 0.7468354430379746
+  history:
+  - epoch: 1
+    loss: 163.5353
+    crf: 162.4211
+    pair: 1.1142
+    span_asp_f1: 0.2941
+    span_opn_f1: 0.6
+    pair_f1_0.5: 0.4229
+    best_tau: 0.7
+    best_f1: 0.4458
+  - epoch: 2
+    loss: 61.699
+    crf: 61.0704
+    pair: 0.6287
+    span_asp_f1: 0.7059
+    span_opn_f1: 0.7468
+    pair_f1_0.5: 0.5366
+    best_tau: 0.7
+    best_f1: 0.555
+artifacts:
+  weights: data/pipeline/pair_extractor.pt
+  meta: data/pipeline/pair_meta.json
+  train_log: outputs/logs/pipeline_pair_report.txt
