@@ -30,7 +30,7 @@ overwrite_cache: true
 preprocessing_num_workers: 16
 
 ### output
-output_dir: ./saves/qwen7b_full_sft
+output_dir: ./saves/qwen7b_full_sft_2ep        # 2 epoch 对照实验, 与 3 epoch 模型隔离
 logging_steps: 10
 save_steps: 500
 plot_loss: true
@@ -40,7 +40,7 @@ overwrite_output_dir: true
 per_device_train_batch_size: 4
 gradient_accumulation_steps: 8
 learning_rate: 6.0e-6                            # 全参学习率较小, 避免灾难性遗忘
-num_train_epochs: 3.0
+num_train_epochs: 2.0                          # 对照实验: 验证第 3 个 epoch 是否过拟合
 lr_scheduler_type: cosine                        # 余弦退火
 warmup_ratio: 0.05
 bf16: true                                       # A100/H100 用 bf16; V100 改 fp16: true

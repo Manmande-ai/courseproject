@@ -68,9 +68,23 @@ QUAD_KEYS = ("AspectTerms", "OpinionTerms", "Categories", "Polarities")
 # ======================================================================
 # Prompt 构造
 # ======================================================================
-def build_prompt(review: str) -> str:
-    """拼接推理 Prompt: instruction + 评论原文。"""
+def build_user_content(review: str) -> str:
+    """用户消息原文: instruction + 评论原文。"""
     return INSTRUCTION + review
+
+
+def build_prompt(tokenizer, review: str) -> str:
+    """用 Qwen 聊天模板包裹 Prompt, 与训练输入格式严格一致。
+
+    训练时 LLaMA-Factory(template=qwen) 实际见到的是
+    '<|im_start|>user\\n...<|im_end|>\\n<|im_start|>assistant\\n';
+    推理必须套同一模板, 否则模型遇到部分句式会直接输出 EOS, 造成零抽取。
+    """
+    return tokenizer.apply_chat_template(
+        [{"role": "user", "content": build_user_content(review)}],
+        add_generation_prompt=True,
+        tokenize=False,
+    )
 
 
 # ======================================================================
@@ -177,7 +191,7 @@ def predict_transformers(model_path: str, adapter_path: str | None,
     n = len(reviews)
     t0 = time.time()
     for i, (rid, review) in enumerate(reviews.items(), 1):
-        prompt = build_prompt(review)
+        prompt = build_prompt(tokenizer, review)
         inputs = tokenizer(prompt, return_tensors="pt").to(model.device)
         with torch.no_grad():
             out = model.generate(
@@ -217,8 +231,12 @@ def predict_vllm(model_path: str, adapter_path: str | None,
         max_tokens=max_new_tokens,
     )
 
+    # 加载 tokenizer, 用与训练一致的 Qwen 聊天模板批量构造 Prompt
+    from transformers import AutoTokenizer
+    tokenizer = AutoTokenizer.from_pretrained(model_path, trust_remote_code=True)
+
     ids = list(reviews.keys())
-    prompts = [build_prompt(reviews[rid]) for rid in ids]
+    prompts = [build_prompt(tokenizer, reviews[rid]) for rid in ids]
 
     print("[推理] vLLM 批量推理 %d 条评论..." % len(ids))
     t0 = time.time()
