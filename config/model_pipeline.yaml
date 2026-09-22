@@ -10,6 +10,9 @@ pretrained: bert-base-chinese
 
 labels:
   bio_tags: ["O", "B-ASP", "I-ASP", "B-OPN", "I-OPN"]
+  categories: ["整体", "使用体验", "功效", "价格", "物流", "气味", "包装",
+               "真伪", "服务", "其他", "成分", "尺寸", "新鲜度"]
+  polarities: ["正面", "负面", "中性"]
 
 hyperparams:
   seed: 42
@@ -30,3 +33,18 @@ pair:
   loss_weight: 1.0        # L = CRF + loss_weight * pair_BCE
   pos_weight: 2.0         # BCE 正样本(真实对)权重, 候选格中正负约 1:5
   thresholds: [0.3, 0.4, 0.5, 0.6, 0.7]
+
+# Stage2 专属: 交叉编码 (Category, Polarity) 分类器
+#   输入: [CLS] review [SEP] 方面词:a 观点词:o [SEP] -> BERT[CLS] -> 双头
+#   隐式 aspect/opinion (原文为空) 输入文本用 "无" 占位
+clf:
+  max_len: 320            # 交叉编码序列上限(含 review + pair 文本, 截 review 留 pair)
+  batch_size: 12
+  epochs: 5
+  lr_bert: 2.0e-5
+  lr_head: 1.0e-3
+  dropout: 0.1
+  loss_weight_cat: 1.0    # L = w_cat * CE_cat + w_pol * CE_pol
+  loss_weight_pol: 1.0
+  class_weight_cap: 10.0  # 截断逆频权重上限, 抑制稀有类(如 新鲜度13) 权重过大
+  implicit_marker: "无"   # 隐式 aspect/opinion 在 pair 文本里的占位词

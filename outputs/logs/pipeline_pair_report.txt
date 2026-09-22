@@ -1,17 +1,35 @@
 ========================================================================
 方案C Stage1 (Aspect,Opinion) 对抽取  pretrained=bert-base-chinese device=cpu
 ========================================================================
-[Epoch 1/2] loss=163.5353 (crf=162.4211 pair=1.1142)
-  span  ASP F1=0.2941  OPN F1=0.6000
-  pair@0.5 P=0.4066 R=0.4405 F1=0.4229 pred/gold=1.08
-  pair@0.7(最优) P=0.4512 R=0.4405 F1=0.4458 pred/gold=0.98 top1兜底=0.000 安全行=0.150
-  [*] best F1=0.4458 (tau=0.7), 已保存权重
-[Epoch 2/2] loss=61.6990 (crf=61.0704 pair=0.6287)
-  span  ASP F1=0.7059  OPN F1=0.7468
-  pair@0.5 P=0.4545 R=0.6548 F1=0.5366 pred/gold=1.44
-  pair@0.7(最优) P=0.4953 R=0.6310 F1=0.5550 pred/gold=1.27 top1兜底=0.000 安全行=0.150
-  [*] best F1=0.5550 (tau=0.7), 已保存权重
-[完成] 耗时 2.2 min, best dev pair F1=0.5550 @tau=0.7
+[Epoch 1/6] loss=67.4926 (crf=66.8582 pair=0.6344)
+  span  ASP F1=0.9018  OPN F1=0.8155
+  pair@0.5 P=0.6817 R=0.7634 F1=0.7203 pred/gold=1.12
+  pair@0.6(最优) P=0.7045 R=0.7510 F1=0.7270 pred/gold=1.07 top1兜底=0.023 安全行=0.039
+  [*] best F1=0.7270 (tau=0.6), 已保存权重
+[Epoch 2/6] loss=23.5928 (crf=23.2696 pair=0.3232)
+  span  ASP F1=0.8941  OPN F1=0.8608
+  pair@0.5 P=0.7332 R=0.8543 F1=0.7891 pred/gold=1.17
+  pair@0.6(最优) P=0.7505 R=0.8388 F1=0.7922 pred/gold=1.12 top1兜底=0.004 安全行=0.010
+  [*] best F1=0.7922 (tau=0.6), 已保存权重
+[Epoch 3/6] loss=13.9889 (crf=13.7431 pair=0.2458)
+  span  ASP F1=0.8957  OPN F1=0.8422
+  pair@0.5 P=0.7210 R=0.8037 F1=0.7601 pred/gold=1.11
+  pair@0.6(最优) P=0.7401 R=0.7882 F1=0.7634 pred/gold=1.06 top1兜底=0.025 安全行=0.010
+[Epoch 4/6] loss=9.1670 (crf=8.9341 pair=0.2329)
+  span  ASP F1=0.8995  OPN F1=0.8618
+  pair@0.5 P=0.7468 R=0.8316 F1=0.7869 pred/gold=1.11
+  pair@0.6(最优) P=0.7665 R=0.8140 F1=0.7896 pred/gold=1.06 top1兜底=0.002 安全行=0.014
+[Epoch 5/6] loss=5.9417 (crf=5.7447 pair=0.1970)
+  span  ASP F1=0.8941  OPN F1=0.8586
+  pair@0.5 P=0.7418 R=0.8368 F1=0.7864 pred/gold=1.13
+  pair@0.7(最优) P=0.7653 R=0.8254 F1=0.7942 pred/gold=1.08 top1兜底=0.014 安全行=0.012
+  [*] best F1=0.7942 (tau=0.7), 已保存权重
+[Epoch 6/6] loss=4.0894 (crf=3.9059 pair=0.1835)
+  span  ASP F1=0.8897  OPN F1=0.8622
+  pair@0.5 P=0.7561 R=0.8357 F1=0.7939 pred/gold=1.10
+  pair@0.7(最优) P=0.7815 R=0.8275 F1=0.8038 pred/gold=1.06 top1兜底=0.012 安全行=0.012
+  [*] best F1=0.8038 (tau=0.7), 已保存权重
+[完成] 耗时 70.4 min, best dev pair F1=0.8038 @tau=0.7
 [输出] 权重: D:\code\机器学习课设\courseproject\courseproject\data\pipeline\pair_extractor.pt
 [输出] 元数据: D:\code\机器学习课设\courseproject\courseproject\data\pipeline\pair_meta.json
 [输出] 快照: D:\code\机器学习课设\courseproject\courseproject\config\model_pipeline_trained.yaml

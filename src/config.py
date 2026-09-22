@@ -55,6 +55,7 @@ BASELINE_LOG_PATH = LOG_DIR / "baseline_report.txt"
 BERT_LOG_PATH = LOG_DIR / "bert_report.txt"           # model_bert.py 训练日志
 LLM_LOG_PATH = LOG_DIR / "llm_report.txt"             # LLM 训练/推理日志
 PIPELINE_PAIR_LOG_PATH = LOG_DIR / "pipeline_pair_report.txt"  # 方案C Stage1 训练日志
+PIPELINE_CLF_LOG_PATH = LOG_DIR / "pipeline_clf_report.txt"   # 方案C Stage2 训练日志
 
 # ----------------------------------------------------------------------
 # LLM SFT 数据与产物路径(data/llm 下)
@@ -84,4 +85,7 @@ PIPELINE_CONFIG_PATH = CONFIG_DIR / "model_pipeline.yaml"
 PIPELINE_TRAINED_SNAPSHOT_PATH = CONFIG_DIR / "model_pipeline_trained.yaml"
 PIPELINE_PAIR_WEIGHTS = PIPELINE_DIR / "pair_extractor.pt"
 PIPELINE_PAIR_META = PIPELINE_DIR / "pair_meta.json"
+# 方案C Stage2: 逐对 (Category, Polarity) 交叉编码分类器
+PIPELINE_CLF_WEIGHTS = PIPELINE_DIR / "pair_classifier.pt"
+PIPELINE_CLF_META = PIPELINE_DIR / "pair_clf_meta.json"
 PIPELINE_RESULT_PATH = PIPELINE_DIR / "Result.csv"
