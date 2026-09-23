@@ -15,3 +15,12 @@ spacy==3.8.7
 PyYAML==6.0.3
 # 中文句法模型(不在 PyPI, 用上面两种方式之一单独安装, 版本需与 spacy 对应):
 # zh_core_web_sm==3.8.0
+
+# ---- BERT+CRF 模型依赖 (model_bert.py / predict_bert.py) ----
+# 安装 (CPU 版 torch): pip install torch --index-url https://download.pytorch.org/whl/cpu
+# 有 CUDA 时改用对应 cu118/cu121 索引; 以下不锁死版本以便用户按硬件选择。
+torch
+transformers
+pytorch-crf
+# 首次运行自动下载 bert-base-chinese; 若网络受限, 可设 HF_ENDPOINT=https://hf-mirror.com
+

@@ -1,0 +1,110 @@
+_doc: 方案C Stage1 对抽取训练快照(自动生成, 勿手工编辑)
+generated_at: '2026-09-22 17:08:59'
+pretrained: bert-base-chinese
+device: cpu
+hyperparams:
+  seed: 42
+  max_len: 256
+  batch_size: 8
+  epochs: 6
+  lr_bert: 2.0e-05
+  lr_head: 0.001
+  weight_decay: 0.01
+  warmup_ratio: 0.1
+  grad_clip: 1.0
+  dropout: 0.1
+  dev_ratio: 0.15
+pair:
+  mlp_dim: 200
+  loss_weight: 1.0
+  pos_weight: 2.0
+  thresholds:
+  - 0.3
+  - 0.4
+  - 0.5
+  - 0.6
+  - 0.7
+training:
+  duration_min: 70.43
+  total_samples: 3229
+  train_samples: 2745
+  dev_samples: 484
+  best_threshold: 0.7
+  best_dev_pair:
+    P: 0.7814634146341464
+    R: 0.8274793388429752
+    F1: 0.8038133467134972
+    tp: 801
+    fp: 224
+    fn: 167
+    pred/gold: 1.059
+    top1兜底率: 0.012
+    安全行率: 0.012
+  span_dev:
+    ASP:
+      P: 0.8754448398576512
+      R: 0.9044117647058824
+      F1: 0.8896925858951176
+    OPN:
+      P: 0.8441955193482689
+      R: 0.8809776833156217
+      F1: 0.8621944877795111
+  history:
+  - epoch: 1
+    loss: 67.4926
+    crf: 66.8582
+    pair: 0.6344
+    span_asp_f1: 0.9018
+    span_opn_f1: 0.8155
+    pair_f1_0.5: 0.7203
+    best_tau: 0.6
+    best_f1: 0.727
+  - epoch: 2
+    loss: 23.5928
+    crf: 23.2696
+    pair: 0.3232
+    span_asp_f1: 0.8941
+    span_opn_f1: 0.8608
+    pair_f1_0.5: 0.7891
+    best_tau: 0.6
+    best_f1: 0.7922
+  - epoch: 3
+    loss: 13.9889
+    crf: 13.7431
+    pair: 0.2458
+    span_asp_f1: 0.8957
+    span_opn_f1: 0.8422
+    pair_f1_0.5: 0.7601
+    best_tau: 0.6
+    best_f1: 0.7634
+  - epoch: 4
+    loss: 9.167
+    crf: 8.9341
+    pair: 0.2329
+    span_asp_f1: 0.8995
+    span_opn_f1: 0.8618
+    pair_f1_0.5: 0.7869
+    best_tau: 0.6
+    best_f1: 0.7896
+  - epoch: 5
+    loss: 5.9417
+    crf: 5.7447
+    pair: 0.197
+    span_asp_f1: 0.8941
+    span_opn_f1: 0.8586
+    pair_f1_0.5: 0.7864
+    best_tau: 0.7
+    best_f1: 0.7942
+  - epoch: 6
+    loss: 4.0894
+    crf: 3.9059
+    pair: 0.1835
+    span_asp_f1: 0.8897
+    span_opn_f1: 0.8622
+    pair_f1_0.5: 0.7939
+    best_tau: 0.7
+    best_f1: 0.8038
+artifacts:
+  weights: data/pipeline/pair_extractor.pt
+  meta: data/pipeline/pair_meta.json
+  train_log: outputs/logs/pipeline_pair_report.txt

@@ -5,3 +5,9 @@ venv/
 # Python 缓存
 __pycache__/
 *.pyc
+
+# 模型权重（体积过大，不入库）
+saves/
+*.pt
+*.pth
+*.safetensors

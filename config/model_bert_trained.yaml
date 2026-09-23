@@ -1,0 +1,71 @@
+_doc: BERT+CRF 训练快照(自动生成, 勿手工编辑); 改超参请改 model_bert.yaml
+generated_at: '2026-09-15 18:36:16'
+pretrained: bert-base-chinese
+device: cpu
+hyperparams:
+  seed: 42
+  max_len: 256
+  batch_size: 8
+  eval_batch_size: 16
+  epochs: 8
+  lr_bert: 2.0e-05
+  lr_head: 0.001
+  weight_decay: 0.01
+  warmup_ratio: 0.1
+  grad_clip: 1.0
+  dropout: 0.1
+  dev_ratio: 0.15
+  amp: false
+loss_weights:
+  w_crf: 1.0
+  w_cat: 0.5
+  w_pol: 0.5
+labels:
+  bio_tags:
+  - O
+  - B-ASP
+  - I-ASP
+  - B-OPN
+  - I-OPN
+  categories:
+  - 包装
+  - 成分
+  - 尺寸
+  - 服务
+  - 功效
+  - 价格
+  - 气味
+  - 使用体验
+  - 物流
+  - 新鲜度
+  - 真伪
+  - 整体
+  - 其他
+  polarities:
+  - 正面
+  - 中性
+  - 负面
+training:
+  duration_min: 122.47
+  total_samples: 3199
+  train_samples: 2720
+  dev_samples: 479
+  best_dev_f1: 0.5918
+  last_epoch:
+    loss: 2.8179
+    crf: 2.6885
+    cat: 0.158
+    pol: 0.1008
+    lr: 0.0
+  last_dev:
+    P: 0.6831550802139037
+    R: 0.5219611848825332
+    F1: 0.5917776491024899
+    tp: 511
+    fp: 237
+    fn: 468
+artifacts:
+  weights: data/bert/bert_crf.pt
+  label_vocab: data/bert/label_vocab.json
+  train_log: outputs/logs/bert_report.txt
+  test_reviews: data/raw/TEST/Test_reviews.csv

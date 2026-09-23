@@ -446,7 +446,7 @@ _SYN_SETS = {
 def load_model_config(path=MODEL_CONFIG_PATH, verbose=True):
     """加载 yaml 模型配置并覆盖模块级默认常量。
 
-    返回加载状态: "ok" / "missing" / "no_pyyaml"。
+    返回加载状态: "ok" / "missing" / "no_pyyaml" / "invalid"。
     词表在 yaml 中以列表书写: 大多数还原为 set; final_particles/product_suffixes
     还原为 tuple; manual_category_kw 保持 list(保留平局优先级顺序与重复词权重)。
     """
@@ -459,56 +459,89 @@ def load_model_config(path=MODEL_CONFIG_PATH, verbose=True):
         if verbose:
             print("[配置] 未安装 PyYAML, 使用代码内默认配置(可 pip install pyyaml)")
         return "no_pyyaml"
-    with open(path, "r", encoding="utf-8") as f:
-        cfg = yaml.safe_load(f) or {}
+    try:
+        with open(path, "r", encoding="utf-8") as f:
+            cfg = yaml.safe_load(f) or {}
+    except yaml.YAMLError as e:
+        if verbose:
+            print("[配置] YAML 语法错误, 全部使用代码默认值: %s" % e)
+        return "invalid"
     g = globals()
+
+    def _set(name, value, cast=None, warn_type=None):
+        """安全赋值: cast/类型校验失败时静默回退, 打印警告。"""
+        try:
+            if cast is not None:
+                value = cast(value)
+            if warn_type is not None and not isinstance(value, warn_type):
+                raise TypeError("expected %s, got %s" % (warn_type.__name__,
+                                                         type(value).__name__))
+            g[name] = value
+            return True
+        except (TypeError, ValueError) as e:
+            if verbose:
+                print("[配置] 字段 %s=%r 无效(%s), 使用代码默认值" % (
+                    name, value, e))
+            return False
 
     hp = cfg.get("hyperparams") or {}
     for key, (name, cast) in _HP_SCALARS.items():
         if hp.get(key) is not None:
-            g[name] = cast(hp[key])
+            _set(name, hp[key], cast=cast)
 
     pol = cfg.get("polarities") or {}
     for key, name in (("positive", "POS"), ("neutral", "NEU"),
                       ("negative", "NEG")):
         if pol.get(key):
-            g[name] = str(pol[key])
+            _set(name, pol[key], cast=str, warn_type=str)
 
     text_cfg = cfg.get("text") or {}
     if text_cfg.get("clause_punct"):
-        g["CLAUSE_PUNCT"] = set(text_cfg["clause_punct"])
+        _set("CLAUSE_PUNCT", text_cfg["clause_punct"], cast=set, warn_type=set)
 
     lex = cfg.get("lexicons") or {}
     for key, name in _LEX_SETS.items():
         if lex.get(key):
-            g[name] = set(lex[key])
+            _set(name, lex[key], cast=set, warn_type=set)
     for key, name in _LEX_TUPLES.items():
         if lex.get(key):
-            g[name] = tuple(lex[key])
+            _set(name, lex[key], cast=tuple, warn_type=tuple)
     if lex.get("manual_seed"):
-        g["MANUAL_SEED"] = {
-            str(k): set(v) for k, v in lex["manual_seed"].items() if v
-        }
+        try:
+            g["MANUAL_SEED"] = {str(k): set(v) for k, v in lex["manual_seed"].items()
+                                if v}
+        except (TypeError, ValueError) as e:
+            if verbose:
+                print("[配置] 字段 manual_seed 无效(%s), 使用默认值" % e)
     if lex.get("manual_category_kw"):
-        g["MANUAL_CATEGORY_KW"] = {
-            str(k): [str(w) for w in v]
-            for k, v in lex["manual_category_kw"].items() if v
-        }
+        try:
+            g["MANUAL_CATEGORY_KW"] = {
+                str(k): [str(w) for w in v]
+                for k, v in lex["manual_category_kw"].items() if v
+            }
+        except (TypeError, ValueError) as e:
+            if verbose:
+                print("[配置] 字段 manual_category_kw 无效(%s), 使用默认值" % e)
     if lex.get("char_category_kw"):
-        g["CHAR_CATEGORY_KW"] = {
-            str(k): str(v) for k, v in lex["char_category_kw"].items()
-        }
+        try:
+            g["CHAR_CATEGORY_KW"] = {
+                str(k): str(v) for k, v in lex["char_category_kw"].items()
+            }
+        except (TypeError, ValueError) as e:
+            if verbose:
+                print("[配置] 字段 char_category_kw 无效(%s), 使用默认值" % e)
 
     syn = cfg.get("syntax") or {}
     for key, name in _SYN_SETS.items():
         if syn.get(key):
-            g[name] = set(syn[key])
+            _set(name, syn[key], cast=set, warn_type=set)
 
     parser_cfg = cfg.get("parser") or {}
     if parser_cfg.get("spacy_model"):
-        g["SPACY_MODEL"] = str(parser_cfg["spacy_model"])
+        _set("SPACY_MODEL", parser_cfg["spacy_model"], cast=str, warn_type=str)
     if parser_cfg.get("parse_batch_size"):
-        g["PARSE_BATCH_SIZE"] = int(parser_cfg["parse_batch_size"])
+        _set("PARSE_BATCH_SIZE", parser_cfg["parse_batch_size"],
+             cast=int, warn_type=int)
 
     if verbose:
         print("[配置] 已加载外部模型配置: %s" % path)
@@ -849,12 +882,24 @@ class DoublePropagation:
                 self.A[w] = "seed_vocab"
                 n_seed_a += 1
 
+        # O_scanned / A_scanned: 记录已被传播规则扫过的词, 避免重复扫描旧词。
+        # 一轮迭代中新发现的词只会在下一轮才被扫 —— 数学上等价于全量扫描,
+        # 但消除了已扫过的词对 _add_aspect/_add_opinion 的冗余调用(它们内部
+        # 对已存在词直接 return False)。
+        O_scanned, A_scanned = set(), set()
+
         for it in range(1, self.max_iter + 1):
-            n_o, n_a = len(self.O), len(self.A)
+            curr_O = set(self.O.keys())
+            curr_A = set(self.A.keys())
+            only_O = curr_O - O_scanned   # 本轮只扫上次未扫的 O
+            only_A = curr_A - A_scanned   # 本轮只扫上次未扫的 A
             src_counter = Counter()
             for pdoc in pdocs.values():
-                self._propagate_doc(pdoc, src_counter)
-            delta_o, delta_a = len(self.O) - n_o, len(self.A) - n_a
+                self._propagate_doc(pdoc, src_counter,
+                                    only_O=only_O, only_A=only_A)
+            O_scanned |= only_O
+            A_scanned |= only_A
+            delta_o, delta_a = len(self.O) - len(curr_O), len(self.A) - len(curr_A)
             self.trace.append({
                 "iter": it, "|O|": len(self.O), "|A|": len(self.A),
                 "new_O": delta_o, "new_A": delta_a,
@@ -902,16 +947,20 @@ class DoublePropagation:
         self.O[w] = (pol, src)
         return True
 
-    def _propagate_doc(self, pdoc, src_counter):
+    def _propagate_doc(self, pdoc, src_counter, only_O=None, only_A=None):
         toks = pdoc.tokens
+        # 扫描限定集: only_O/only_A 非 None 时只扫这些词; 仍查 self.O/self.A 全集
+        # 判断目标侧是否已存在 (避免新发现的 A/O 在同一轮被重复添加)。
+        _O = only_O if only_O is not None else self.O
+        _A = only_A if only_A is not None else self.A
         for k, tk in enumerate(toks):
             # ---------- R1: O -> A ----------
-            if tk.text in self.O:
+            if tk.text in _O:
                 for a, rel in self._ot_neighbors(toks, k, side="o"):
                     if self._is_noun(toks[a]) and self._add_aspect(toks[a], "R1", rel):
                         src_counter["R1"] += 1
             # ---------- R2: A -> O ----------
-            if tk.text in self.A and not (
+            if tk.text in _A and not (
                     tk.pos == "VERB" and tk.text in FUNCTIONAL_VERBS):
                 for o, rel in self._ot_neighbors(toks, k, side="a"):
                     ot = toks[o]
@@ -923,14 +972,14 @@ class DoublePropagation:
                             src_counter["R2"] += 1
         # ---------- R3: A -> A(并列/共同依存) ----------
         for k, tk in enumerate(toks):
-            if not (tk.text in self.A and self._is_noun(tk)):
+            if not (tk.text in _A and self._is_noun(tk)):
                 continue
             for j, rel in self._tt_neighbors(toks, k):
                 if self._is_noun(toks[j]) and self._add_aspect(toks[j], "R3", rel):
                     src_counter["R3"] += 1
         # ---------- R4: O -> O(并列, 传播极性) ----------
         for k, tk in enumerate(toks):
-            if tk.text not in self.O:
+            if tk.text not in _O:
                 continue
             # 功能性动词(用/买/试...)即使被少量标为观点, 也不作为 R4 传播锚点,
             # 避免 "天天用都不心疼" 中 用->心疼 的误传播

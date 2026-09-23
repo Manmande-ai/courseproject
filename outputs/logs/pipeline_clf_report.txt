@@ -1,0 +1,46 @@
+========================================================================
+方案C Stage2 (Category,Polarity) 交叉编码分类  pretrained=bert-base-chinese device=cpu
+========================================================================
+[Epoch 1/5] loss=1.5467 (cat=0.9155 pol=0.6311)
+  cat  macro-F1=0.9169 acc=0.9556   pol macro-F1=0.7387 acc=0.9649   quad(给定gold对)acc=0.9215
+  [*] best score=0.8278 (cat_mF1=0.9169 pol_mF1=0.7387), 已保存权重
+[Epoch 2/5] loss=0.7021 (cat=0.2783 pol=0.4237)
+  cat  macro-F1=0.8807 acc=0.9483   pol macro-F1=0.8348 acc=0.9752   quad(给定gold对)acc=0.9267
+  [*] best score=0.8577 (cat_mF1=0.8807 pol_mF1=0.8348), 已保存权重
+[Epoch 3/5] loss=0.4743 (cat=0.2058 pol=0.2685)
+  cat  macro-F1=0.9176 acc=0.9628   pol macro-F1=0.8364 acc=0.9742   quad(给定gold对)acc=0.9380
+  [*] best score=0.8770 (cat_mF1=0.9176 pol_mF1=0.8364), 已保存权重
+[Epoch 4/5] loss=0.2592 (cat=0.1158 pol=0.1434)
+  cat  macro-F1=0.9036 acc=0.9566   pol macro-F1=0.8619 acc=0.9773   quad(给定gold对)acc=0.9360
+  [*] best score=0.8827 (cat_mF1=0.9036 pol_mF1=0.8619), 已保存权重
+[Epoch 5/5] loss=0.1411 (cat=0.0732 pol=0.0679)
+  cat  macro-F1=0.8966 acc=0.9587   pol macro-F1=0.8507 acc=0.9773   quad(给定gold对)acc=0.9370
+[完成] 耗时 173.4 min, best score=0.8827
+
+[Category 每类明细]
+  整体     support=417  P=0.981 R=0.971 F1=0.976
+  使用体验   support=136  P=0.954 R=0.912 F1=0.932
+  功效     support=114  P=0.902 R=0.965 F1=0.932
+  价格     support=112  P=0.965 R=0.982 F1=0.973
+  物流     support=68   P=0.957 R=0.985 F1=0.971
+  气味     support=37   P=1.000 R=0.946 F1=0.972
+  包装     support=29   P=0.931 R=0.931 F1=0.931
+  真伪     support=23   P=0.958 R=1.000 F1=0.979
+  服务     support=11   P=0.900 R=0.818 F1=0.857
+  其他     support=10   P=0.625 R=0.500 F1=0.556
+  成分     support=6    P=1.000 R=1.000 F1=1.000
+  尺寸     support=2    P=0.500 R=1.000 F1=0.667
+  新鲜度    support=3    P=1.000 R=1.000 F1=1.000
+[Polarity 每类明细]
+  正面     support=867  P=0.993 R=0.987 F1=0.990
+  负面     support=80   P=0.865 R=0.963 F1=0.911
+  中性     support=21   P=0.765 R=0.619 F1=0.684
+[最易混淆 Category 对 (top5)]
+  gold=使用体验 -> pred=功效  n=10
+  gold=整体 -> pred=价格  n=4
+  gold=整体 -> pred=其他  n=2
+  gold=价格 -> pred=整体  n=2
+  gold=功效 -> pred=整体  n=2
+[输出] 权重: D:\code\机器学习课设\courseproject\courseproject\data\pipeline\pair_classifier.pt
+[输出] 元数据: D:\code\机器学习课设\courseproject\courseproject\data\pipeline\pair_clf_meta.json
+[输出] 快照: config/model_pipeline_clf_trained.yaml

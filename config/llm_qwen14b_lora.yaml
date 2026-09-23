@@ -1,0 +1,51 @@
+# =============================================================================
+# LLaMA-Factory LoRA 配置 —— Qwen-3-14B
+# =============================================================================
+# 适用模型: Qwen/Qwen3-14B-Instruct
+# 训练方式: LoRA(低秩适配), 冻结基础模型仅训练增量权重
+# 显存预估: ~30GB, 单卡 24G+ 可跑(配合 gradient_checkpointing)
+#
+# 运行方式(在 LLaMA-Factory 根目录执行):
+#   llamafactory-cli train /path/to/courseproject/courseproject/config/llm_qwen14b_lora.yaml
+#
+# 注意: dataset_dir 需指向本项目的 data/llm 目录(含 sft_train.json 与 dataset_info.json)
+# =============================================================================
+
+### model
+model_name_or_path: Qwen/Qwen3-14B-Instruct
+trust_remote_code: true
+
+### method
+stage: sft
+do_train: true
+finetuning_type: lora
+lora_target: all                                 # 对所有线性层加 LoRA, 效果最好
+lora_rank: 64                                    # 秩越大拟合越强, 显存越大
+lora_alpha: 128                                  # 通常 = 2 * rank
+lora_dropout: 0.05
+
+### dataset
+dataset: sft_train
+dataset_dir: ./data/llm                         # 指向 courseproject/courseproject/data/llm
+template: qwen
+cutoff_len: 1024
+max_samples: 100000
+overwrite_cache: true
+preprocessing_num_workers: 16
+
+### output
+output_dir: ./saves/qwen14b_lora
+logging_steps: 10
+save_steps: 500
+plot_loss: true
+overwrite_output_dir: true
+
+### train
+per_device_train_batch_size: 4
+gradient_accumulation_steps: 4
+learning_rate: 1.0e-4                            # LoRA 学习率比全参大 1-2 个数量级
+num_train_epochs: 3.0
+lr_scheduler_type: cosine
+warmup_ratio: 0.05
+bf16: true
+gradient_checkpointing: true

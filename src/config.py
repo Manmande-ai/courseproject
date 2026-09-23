@@ -18,6 +18,16 @@ from pathlib import Path
 BASE_DIR = Path(__file__).resolve().parents[1]
 
 # ----------------------------------------------------------------------
+# 产物目录(outputs 三层结构: processed=清洗数据 / figures=图表 / logs=运行日志)
+# ----------------------------------------------------------------------
+PROCESSED_DIR = BASE_DIR / "outputs" / "processed"    # preprocess.py 清洗数据输出
+FIGURES_DIR = BASE_DIR / "outputs" / "figures"        # eda.py 图表输出
+BASELINE_DIR = BASE_DIR / "data" / "baseline"         # model_baseline.py 输出
+BERT_DIR = BASE_DIR / "data" / "bert"                # model_bert.py 输出(权重/Result)
+LLM_DIR = BASE_DIR / "data" / "llm"                  # LLM SFT 数据与预测结果
+PIPELINE_DIR = BASE_DIR / "data" / "pipeline"        # 方案C 管道式模型产物(Stage1/Stage2 权重/Result)
+
+# ----------------------------------------------------------------------
 # 原始数据路径
 # ----------------------------------------------------------------------
 TRAIN_REVIEWS_PATH = BASE_DIR / "data" / "raw" / "TRAIN" / "Train_reviews.csv"
@@ -25,19 +35,57 @@ TRAIN_LABELS_PATH = BASE_DIR / "data" / "raw" / "TRAIN" / "Train_labels.csv"
 TEST_REVIEWS_PATH = BASE_DIR / "data" / "raw" / "TEST" / "Test_reviews.csv"
 
 # ----------------------------------------------------------------------
-# 产物目录(outputs 三层结构: processed=清洗数据 / figures=图表 / logs=运行日志)
+# 预处理产物路径(outputs/processed 下, model_bert.py 直接复用, 无需重跑预处理)
+#   - 标签里的字符偏移是对原始 Reviews 文本的索引, 故 BERT 输入也用 Reviews 列
 # ----------------------------------------------------------------------
-PROCESSED_DIR = BASE_DIR / "outputs" / "processed"    # preprocess.py 清洗数据输出
-FIGURES_DIR = BASE_DIR / "outputs" / "figures"        # eda.py 图表输出
-BASELINE_DIR = BASE_DIR / "data" / "baseline"         # model_baseline.py 输出
+TRAIN_REVIEWS_PROC_PATH = PROCESSED_DIR / "Train_reviews_processed.csv"
+TRAIN_LABELS_PARSED_PATH = PROCESSED_DIR / "Train_labels_parsed.csv"
+TEST_REVIEWS_PROC_PATH = PROCESSED_DIR / "Test_reviews_processed.csv"
 
 # eda.py 图表目录
 EDA_FIG_DIR = FIGURES_DIR
 
 # ----------------------------------------------------------------------
-# 运行日志(三个脚本的文字报告统一存放于 outputs/logs)
+# 运行日志(脚本文字报告统一存放于 outputs/logs)
 # ----------------------------------------------------------------------
 LOG_DIR = BASE_DIR / "outputs" / "logs"
 PREPROCESS_LOG_PATH = LOG_DIR / "preprocess_report.txt"
 EDA_REPORT_PATH = LOG_DIR / "eda_report.txt"
 BASELINE_LOG_PATH = LOG_DIR / "baseline_report.txt"
+BERT_LOG_PATH = LOG_DIR / "bert_report.txt"           # model_bert.py 训练日志
+LLM_LOG_PATH = LOG_DIR / "llm_report.txt"             # LLM 训练/推理日志
+PIPELINE_PAIR_LOG_PATH = LOG_DIR / "pipeline_pair_report.txt"  # 方案C Stage1 训练日志
+PIPELINE_CLF_LOG_PATH = LOG_DIR / "pipeline_clf_report.txt"   # 方案C Stage2 训练日志
+
+# ----------------------------------------------------------------------
+# LLM SFT 数据与产物路径(data/llm 下)
+#   - sft_train.json:       LLaMA-Factory 训练数据(alpaca 格式)
+#   - dataset_info.json:    LLaMA-Factory 数据集注册
+#   - Result.csv:           LLM 推理后拍平的提交结果
+# ----------------------------------------------------------------------
+LLM_SFT_TRAIN_PATH = LLM_DIR / "sft_train.json"
+LLM_DATASET_INFO_PATH = LLM_DIR / "dataset_info.json"
+LLM_RESULT_PATH = LLM_DIR / "Result.csv"
+
+# ----------------------------------------------------------------------
+# 配置目录(手工编辑的超参 YAML + 训练完自动生成的快照 YAML)
+# ----------------------------------------------------------------------
+CONFIG_DIR = BASE_DIR / "config"
+BERT_CONFIG_PATH = CONFIG_DIR / "model_bert.yaml"             # 手工编辑的超参
+BERT_TRAINED_SNAPSHOT_PATH = CONFIG_DIR / "model_bert_trained.yaml"  # 训练完自动 dump 的快照
+LLM_QWEN7B_FULL_CONFIG_PATH = CONFIG_DIR / "llm_qwen7b_full.yaml"    # Qwen-2.5-7B/3-8B 全参 SFT
+LLM_QWEN14B_LORA_CONFIG_PATH = CONFIG_DIR / "llm_qwen14b_lora.yaml"  # Qwen-3-14B LoRA
+
+# ----------------------------------------------------------------------
+# 方案C 管道式: Stage1 (A,O) 对抽取 配置/权重/快照
+#   - pair_extractor.pt:   BERT-CRF span + 双仿射配对模型权重
+#   - pair_meta.json:      标签字典 + 最优阈值/评估指标
+# ----------------------------------------------------------------------
+PIPELINE_CONFIG_PATH = CONFIG_DIR / "model_pipeline.yaml"
+PIPELINE_TRAINED_SNAPSHOT_PATH = CONFIG_DIR / "model_pipeline_trained.yaml"
+PIPELINE_PAIR_WEIGHTS = PIPELINE_DIR / "pair_extractor.pt"
+PIPELINE_PAIR_META = PIPELINE_DIR / "pair_meta.json"
+# 方案C Stage2: 逐对 (Category, Polarity) 交叉编码分类器
+PIPELINE_CLF_WEIGHTS = PIPELINE_DIR / "pair_classifier.pt"
+PIPELINE_CLF_META = PIPELINE_DIR / "pair_clf_meta.json"
+PIPELINE_RESULT_PATH = PIPELINE_DIR / "Result.csv"

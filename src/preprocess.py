@@ -206,10 +206,6 @@ def process_reviews(df: pd.DataFrame):
     n_blank = int(blank_mask.sum())
     df = df.loc[~blank_mask].copy()
 
-    # 2) 去重(保留首次出现)
-    dup_mask = df["Reviews"].duplicated(keep="first")
-    n_dup = int(dup_mask.sum())
-    df = df.loc[~dup_mask].copy()
 
     # 3) 去噪/特殊符号清理 + 4) 剔除清洗后为空的无意义内容
     df["clean_text"] = df["Reviews"].map(clean_text)
@@ -221,7 +217,7 @@ def process_reviews(df: pd.DataFrame):
         lambda t: filter_tokens(tokenize(t)))
 
     stats = {
-        "n0": n0, "n_blank": n_blank, "n_dup": n_dup,
+        "n0": n0, "n_blank": n_blank, 
         "n_empty": n_empty, "n_final": len(df),
         "n_zero_tokens": int((df["tokens"].map(len) == 0).sum()),
     }
@@ -282,9 +278,6 @@ def main():
     log("[词典] 标注 %d 行/覆盖 %d 条评论; 唯一方面词 %d, 唯一观点词 %d"
         % (vstats["n_rows"], vstats["n_review_ids"],
            vstats["n_aspect_terms"], vstats["n_opinion_terms"]))
-    log("[词典] 注入 jieba: 标注词 %d + 人工词 %d => 去重合并 %d 词; 跳过含标点标注词 %s"
-        % (vstats["n_label_terms_valid"], vstats["n_manual_terms"],
-           vstats["n_dict_total"], vstats["skipped_terms"] or "无"))
     conflicts = audit_stopwords(raw_labels)
     log("[词典] 停用词安全校验: %s"
         % ("自动剔除误收录标注词 %s" % conflicts if conflicts else "通过(0 冲突)"))
@@ -305,7 +298,7 @@ def main():
         save_df["tokens"] = save_df["tokens"].map(lambda xs: " ".join(xs))
         save_df = save_df[["id", "Reviews", "clean_text", "tokens"]]
         save_df.to_csv(out_path, index=False, encoding="utf-8-sig")
-        log(f"[{name}] {st['n0']} -> 去空(-{st['n_blank']}) -> 去重(-{st['n_dup']}) "
+        log(f"[{name}] {st['n0']} -> 去空(-{st['n_blank']}) "
             f"-> 去无意义(-{st['n_empty']}) = {st['n_final']}; "
             f"0有效词评论 {st['n_zero_tokens']} 条; 输出: {out_path.name}")
 
